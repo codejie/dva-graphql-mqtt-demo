@@ -10,6 +10,7 @@ const app = dva();
 // 3. Model
 // app.model(require('./models/example').default);
 app.model(require('./models/graphql-model').default);
+app.model(require('./models/mqtt-model').default);
 
 // 4. Router
 app.router(require('./router').default);

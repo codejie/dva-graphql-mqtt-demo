@@ -1,6 +1,9 @@
 
 import ApolloClient from 'apollo-boost';
-import gql from 'graphql-tag';
+
+// options = {
+//     uri
+// };
 
 class GraphQLClient {
     constructor (opts) {
@@ -21,13 +24,7 @@ class GraphQLClient {
             if (this.client) {
                 const schema = {
                     query: query,
-                    variables: variables
-                    // query: gql`(request)`
-                    // query: gql`
-                    //     query {
-                    //         version
-                    //     }
-                    // `
+                    variables: variables || {}
                 }
                 this.client.query(schema)
                     .then(response => {

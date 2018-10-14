@@ -1,5 +1,5 @@
 
-import GraphQLClient from '../ext/graphql';
+import GraphQLClient from '../ext/graphql-client';
 
 const graphqlModel = {
     namespace: 'graphql',
@@ -11,7 +11,7 @@ const graphqlModel = {
         update (state, action) {
             return {
                 ...state,
-                ...action.payload
+                ...action.result
             };
         }
     },
@@ -23,7 +23,7 @@ const graphqlModel = {
             });
             yield put({
                 type: 'update',
-                payload: ret
+                result: ret
             });
         }
     },
@@ -34,7 +34,6 @@ const graphqlModel = {
             };
             graphqlModel.client = new GraphQLClient(opts);
             graphqlModel.client.connect();
-
         }
     },
 

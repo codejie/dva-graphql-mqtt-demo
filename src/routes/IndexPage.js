@@ -16,6 +16,9 @@ function IndexPage() {
         <li>
           <Link to="/graphql">GraphQL</Link>
         </li>
+        <li>
+          <Link to="/mqtt">MQTT</Link>
+        </li>        
       </ul>
     </div>
   );
