@@ -19,7 +19,18 @@ const graphqlModel = {
         *query (action, { call, put }) {
             const ret = yield call(graphqlModel.invoke, {
                 method: 'query',
-                request: action.request
+                action
+                // request: action.request
+            });
+            yield put({
+                type: 'update',
+                result: ret
+            });
+        },
+        *mutate (action, { call, put }) {
+            const ret = yield call(graphqlModel.invoke, {
+                method: 'mutate',
+                action
             });
             yield put({
                 type: 'update',
@@ -38,12 +49,9 @@ const graphqlModel = {
     },
 
     client: null,
-    invoke ({method, request}) {
-        return graphqlModel.client[method](request);
+    invoke ({method, action}) {
+        return graphqlModel.client[method](action);
     }
-    // query (request) {
-    //     return graphqlModel.client.query(request);
-    // }
 };
 
 export default graphqlModel;

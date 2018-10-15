@@ -36,6 +36,12 @@ const mqttModel = {
                 topic: action.topic,
                 message: action.message
             };
+        },
+        error (state, action) {
+            return {
+                ...state,
+                error: action.error
+            };
         }
     },
     effects: {
@@ -47,6 +53,11 @@ const mqttModel = {
             //     type: 'connected',
             //     connected: true
             // });
+        },
+        *disconnect (action, { call, put }) {
+            yield call(mqttModel.invoke, {
+                method: 'disconnect'
+            });
         },
         *subscribe (action, { call, put }) {
             try {
@@ -62,12 +73,36 @@ const mqttModel = {
 
             } catch (err) {
                 yield put({
-                    type: 'subscribed',
-                    subscribed: false,
-                    topic: action.topic,
+                    type: 'error',
                     error: err.message
                 });
             };
+        },
+        *unsubscribe (action, { call, put }) {
+            try {
+                const ret = yield call(mqttModel.invoke, {
+                    method: 'unsubscribe',
+                    action
+                })
+            } catch (err) {
+                yield put({
+                    type: 'error',
+                    error: err.message
+                });
+            }
+        },
+        *unsubscribe_all (action, { call, put }) {
+            try {
+                const ret = yield call(mqttModel.invoke, {
+                    method: 'unsubscribeAll',
+                    action
+                })
+            } catch (err) {
+                yield put({
+                    type: 'error',
+                    error: err.message
+                });
+            }            
         },
         *publish (action, { call, put }) {
             try {
@@ -83,10 +118,8 @@ const mqttModel = {
                 });
             } catch (err) {
                 yield put({
-                    type: 'published',
-                    published: false,
-                    topic: action.topic,
-                    message: action.message
+                    type: 'error',
+                    error: err.message
                 });
             }
         }
@@ -95,7 +128,9 @@ const mqttModel = {
         init ({ history, dispatch }) {
             const opts = {
                 uri: 'mqtts://port.51mcee.com:3385',
+                clientId: 'test',
                 onConnected: () => mqttModel.onConnected(dispatch),
+                onClose: () => mqttModel.onDisconnected(dispatch),
                 onMessage: (topic, message) => mqttModel.onMessage(dispatch, topic, message.toString())
             };
             mqttModel.client = new MQTTClient(opts);
@@ -104,21 +139,18 @@ const mqttModel = {
 
     client: null,
     invoke ({method, action}) {
-        switch(method) {
-            case 'connect':
-                return mqttModel.client.connect();
-            case 'subscribe':
-                return mqttModel.client.subscribe(action.topic);
-            case 'publish':
-                return mqttModel.client.publish(action.topic, action.message);
-            default:
-                throw new Error('unknown method - ' + method);
-        }
+        return mqttModel.client[method](action);
     },
     onConnected (dispatch) {
         dispatch({
             type: 'connected',
             connected: true
+        });
+    },
+    onDisconnected (dispatch) {
+        dispatch({
+            type: 'connected',
+            connected: false
         });
     },
     onMessage (dispatch, topic, message) {

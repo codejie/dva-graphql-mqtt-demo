@@ -6,6 +6,12 @@ function onButtonConnect () {
     });
 }
 
+function onButtonDisconnect () {
+    MQTTPage.props.dispatch({
+        type: 'mqtt/disconnect',
+    });
+}
+
 function onButtonSubscribe () {
     MQTTPage.props.dispatch({
         type: 'mqtt/subscribe',
@@ -13,11 +19,25 @@ function onButtonSubscribe () {
     });    
 }
 
+function onButtonUnsubscribe () {
+    MQTTPage.props.dispatch({
+        type: 'mqtt/unsubscribe',
+        topic: 'dva_test'
+    });    
+}
+
+function onButtonUnsubscribeAll () {
+    MQTTPage.props.dispatch({
+        type: 'mqtt/unsubscribe_all',
+        topic: 'dva_test',
+    });    
+}
+
 function onButtonPublish () {
     MQTTPage.props.dispatch({
         type: 'mqtt/publish',
         topic: 'dva_test',
-        message: 'hello mqtt',
+        message: (new Date()).toISOString()// 'hello mqtt',
     });    
 }
 
@@ -31,13 +51,17 @@ function MQTTPage (props) {
             <h1>message = {props.message}</h1>
             <div>
                 <button onClick={onButtonConnect}>connect</button>
+                <button onClick={onButtonDisconnect}>disconnect</button>
             </div>
             <div>
                 <button onClick={onButtonSubscribe}>subscribe</button>
+                <button onClick={onButtonUnsubscribe}>unsubscribe</button>
+                <button onClick={onButtonUnsubscribeAll}>unsubscribe all</button>
             </div>
             <div>
                 <button onClick={onButtonPublish}>publish</button>
             </div>
+            <h1>error = {props.error}</h1>
         </div>
     );
 }

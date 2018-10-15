@@ -2,6 +2,7 @@ import MQTT from 'mqtt';
 
 // options = {
 //     uri,
+//     clientId,
 //     onConnected,
 //     onMessage,
 //     onClose,
@@ -13,13 +14,18 @@ class MQTTClient {
     constructor (opts) {
         this.opts = opts;
         this.client = null;
+
+        this.topics = {};
     }
 
     connect () {
         if (!this.opts || !this.opts.uri) {
             throw new Error('uri parameter missed.');
         }
-        this.client = MQTT.connect(this.opts.uri);
+        const opts = {
+            clientId: this.opts.clientId || 'mqtt-client-dva'
+        };
+        this.client = MQTT.connect(this.opts.uri, opts);
         if (this.opts.onConnected) {
             this.client.on('connect', this.opts.onConnected);
         }
@@ -37,17 +43,22 @@ class MQTTClient {
         }
     }
 
-    // onMessage (topic, message) {
-    //     this.opts.onMessage(topic, message.toString());
-    // }
+    disconnect () {
+        if (this.client) {
+            this.client.end();
+        }
+    }
 
-    subscribe (topic) {
+    subscribe ({topic}) {
         return new Promise((resolve, reject) => {
             if (this.client) {
                 this.client.subscribe(topic, (err) => {
                     if (err) {
                         return reject(err);
                     }
+
+                    this.topics[topic] = new Date();
+
                     resolve({topic});
                 });
             } else {
@@ -56,10 +67,50 @@ class MQTTClient {
         });
     }
 
-    publish (topic, message) {
+    unsubscribe ({topic}) {
         return new Promise((resolve, reject) => {
             if (this.client) {
-                this.client.publish(topic, message, (err) => {
+                this.client.unsubscribe(topic, (err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    delete this.topics[topic];
+
+                    resolve({topic});
+                });
+            } else {
+                reject(new Error('not connected'));
+            }
+        });
+    }
+
+    unsubscribeAll () {
+        return new Promise((resolve, reject) => {
+            if (this.client) {
+                const array = [];
+                Object.keys(this.topics).map(key => {
+                    array.push(key);
+                });
+                this.client.unsubscribe(array, (err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+
+                    this.topics = {};
+
+                    resolve();
+                });
+            } else {
+                reject(new Error('not connected'));
+            }
+        });
+    }
+
+    publish ({topic, message}) {
+        return new Promise((resolve, reject) => {
+            if (this.client) {
+                this.client.publish(topic, message, undefined, (err) => {
                     if (err) {
                         return reject(err);
                     }
