@@ -3,7 +3,10 @@ import ApolloClient from 'apollo-boost';
 
 // options = {
 //     uri
+//     cached: false
 // };
+
+// https://www.apollographql.com/docs/react/api/apollo-client.html
 
 class GraphQLClient {
     constructor (opts) {
@@ -22,11 +25,12 @@ class GraphQLClient {
         // console.log('ql request = ' + JSON.stringify(query));
         return new Promise((resolve, reject) => {
             if (this.client) {
-                const schema = {
+                const options = {
                     query: query,
-                    variables: variables || {}
+                    variables: variables || {},
+                    fetchPolicy: this.opts.cached ? undefined : 'no-cache'
                 }
-                this.client.query(schema)
+                this.client.query(options)
                     .then(response => {
                         const ret = {};
                         if (response.error) {
@@ -56,11 +60,11 @@ class GraphQLClient {
     mutate ({mutation, variables}) {
         return new Promise((resolve, reject) => {
             if (this.client) {
-                const schema = {
+                const options = {
                     mutation: mutation,
                     variables: variables || {}
                 }
-                this.client.mutate(schema)
+                this.client.mutate(options)
                     .then(response => {
                         const ret = {};
                         if (response.error) {
