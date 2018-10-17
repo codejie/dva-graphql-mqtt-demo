@@ -127,7 +127,7 @@ const mqttModel = {
     subscriptions: {
         init ({ history, dispatch }) {
             const opts = {
-                uri: 'mqtts://port.51mcee.com:3385',
+                url: 'mqtts://port.51mcee.com:3385',
                 clientId: 'test',
                 onConnected: () => mqttModel.onConnected(dispatch),
                 onClose: () => mqttModel.onDisconnected(dispatch),

@@ -8,4 +8,4 @@ a dva demo application that supports GraphQL and MQTT
 ```
 
 #Notes
-'subscription' does NOT supporte yet.
+supported  'subscription' in MQTT and GraphQL.

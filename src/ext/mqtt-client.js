@@ -1,7 +1,7 @@
 import MQTT from 'mqtt';
 
 // options = {
-//     uri,
+//     url,
 //     clientId,
 //     onConnected,
 //     onMessage,
@@ -19,13 +19,13 @@ class MQTTClient {
     }
 
     connect () {
-        if (!this.opts || !this.opts.uri) {
-            throw new Error('uri parameter missed.');
+        if (!this.opts || !this.opts.url) {
+            throw new Error('url parameter missed.');
         }
         const opts = {
             clientId: this.opts.clientId || 'mqtt-client-dva'
         };
-        this.client = MQTT.connect(this.opts.uri, opts);
+        this.client = MQTT.connect(this.opts.url, opts);
         if (this.opts.onConnected) {
             this.client.on('connect', this.opts.onConnected);
         }

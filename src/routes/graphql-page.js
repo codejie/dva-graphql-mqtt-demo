@@ -70,6 +70,35 @@ function onMutation1Click () {
     });
 }
 
+
+function onSubscriptionClick () {
+    graphqlPage.props.dispatch({
+        type: 'graphql/subscribe',
+        topic: 'newBook',
+        subscription: gql`
+        subscription {
+            newBook {
+                title
+                author
+            }}
+        `,
+        variables: {}
+    });
+}
+
+function onWSConnectClick () {
+    graphqlPage.props.dispatch({
+        type: 'graphql/wsconnect',
+        url: 'ws://localhost:3000/subscriptions'
+    //     subscription: gql`
+    //     subscription version {
+    //             version
+    //         }
+    //     `,
+    //     variables: {}
+    });
+}
+
 function graphqlPage (props) {
     graphqlPage.props = props;
     return (
@@ -83,7 +112,13 @@ function graphqlPage (props) {
             </div>
             <div>
                 <button onClick={ onMutation1Click }>mutation by other way</button>
-            </div>                   
+            </div>
+            <div>
+                <button onClick={ onWSConnectClick }>wsConnect</button>
+            </div>               
+            <div>
+                <button onClick={ onSubscriptionClick }>subscription</button>
+            </div>                
         </div>
     );
 }
